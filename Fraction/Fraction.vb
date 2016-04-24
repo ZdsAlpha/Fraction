@@ -317,34 +317,34 @@ Public Structure Fraction
         Return Fraction.Parse(Number.ToString)
     End Operator
 
-    Public Shared Widening Operator CType(Fraction As Fraction) As Byte
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Byte
         Return CByte(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As SByte
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As SByte
         Return CSByte(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Short
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Short
         Return CShort(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As UShort
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As UShort
         Return CUShort(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Integer
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Integer
         Return CInt(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As UInteger
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As UInteger
         Return CUInt(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Long
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Long
         Return CLng(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As ULong
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As ULong
         Return CULng(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Single
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Single
         Return Single.Parse(Fraction.ToString(10))
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Double
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Double
         Return Single.Parse(Fraction.ToString(20))
     End Operator
 
