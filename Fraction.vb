@@ -111,6 +111,7 @@ Public Structure Fraction
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
         Me._Numerator = Numerator
         Me._Denominator = Denominator
+        Me.Simplify()
     End Sub
     Public Sub Simplify()
         If Denominator = 0 Then
