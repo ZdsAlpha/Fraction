@@ -160,13 +160,10 @@ Public Structure Fraction
     End Sub
 
     Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-        Dim f As Fraction = obj
-        If Me = f Then Return True
-        Return False
+        Return Me.CompareTo(obj)
     End Function
     Public Function CompareTo(other As Fraction) As Integer Implements IComparable(Of Fraction).CompareTo
-        If Me = other Then Return True
-        Return False
+        Return Me.WholeNumber - other.WholeNumber
     End Function
     Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
         If Me = other Then Return True
