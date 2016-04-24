@@ -160,11 +160,25 @@ Public Structure Fraction
     End Sub
 
     Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-        Return Me.CompareTo(obj)
+        If obj Is Nothing Then Return 1
+        If TypeOf obj Is Fraction Then
+            Return CompareTo(CType(obj, Fraction))
+        Else
+            Throw New ArgumentException(String.Format("{0} is not a {1}", NameOf(obj), [GetType].FullName))
+        End If
+
+
+
     End Function
     Public Function CompareTo(other As Fraction) As Integer Implements IComparable(Of Fraction).CompareTo
-        Return Me.WholeNumber - other.WholeNumber
+        If Me = other Then Return 0
+        If Me > other Then
+            Return 1
+        Else
+            Return -1
+        End If
     End Function
+
     Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
         If Me = other Then Return True
         Return False
