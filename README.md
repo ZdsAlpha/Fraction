@@ -13,3 +13,9 @@ Best solution if you are dealing with fraction. It is implemented over BigIntege
  6. Allows parsing from string to fraction e.g "1/33" , "-1.0003" etc
  7. Allows forced reduction of fraction by adding proper number to numerator or denominator. Use Fraction.Reduce() . A common example is reduction of 333333333333333/1000000000000000 is 1/3.
  8. Supports operations ,comparisons and conversion.
+
+----------
+
+## Upcoming Features ##
+
+ 1. Fraction will be available in c#
