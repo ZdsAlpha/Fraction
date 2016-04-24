@@ -6,7 +6,7 @@ Best solution if you are dealing with fraction. It is implemented over BigIntege
 ## Fratures ##
 
  1. Automatically simplifies fraction into its reduced form.
- 2. Fraction can be represented in form of Mixed Fraction. Get or Set WholeNumber or ProperFraction property.
+ 2. Fraction can be represented in form of Mixed Fraction. Get or Set Fraction.WholeNumber or Fraction.ProperFraction property.
  3. Supports undefined values. Every undefined value is converted into 0/0.
  4. Implemented over BigInteger can store all possible rational numbers. It is more accurate than decimal.
  5. Convert fraction to string. Specify n digits after decimal point.
