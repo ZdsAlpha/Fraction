@@ -1,4 +1,4 @@
-﻿Imports System.Numerics
+Imports System.Numerics
 Public Structure Fraction
     Private _Numerator As BigInteger
     Private _Denominator As BigInteger
@@ -134,7 +134,12 @@ Public Structure Fraction
         Me.Reduce(Change, Change)
     End Sub
     Public Sub Reduce(ChangeInNumerator As Long, ChangeInDenominator As Long)
+        Dim IsNegitive As Boolean = False
         Dim Proper As Fraction = Me.ProperFraction
+        If Proper < 0 Then
+            IsNegitive = True
+            Proper = Proper.Absolute
+        End If
         Dim Reduced As Fraction = Proper
         For CIN As Long = -ChangeInNumerator To ChangeInNumerator
             For CID As Long = -ChangeInDenominator To ChangeInDenominator
@@ -145,7 +150,11 @@ Public Structure Fraction
                     Not Fraction.IsUndefined Then Reduced = Fraction
             Next
         Next
-        Me.ProperFraction = Reduced
+        If IsNegitive = True Then
+            Me.ProperFraction = -Reduced
+        Else
+            Me.ProperFraction = Reduced
+        End If
     End Sub
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
@@ -202,6 +211,7 @@ Public Structure Fraction
     End Operator
 
     Public Shared Operator =(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
+        If Fraction1.IsNull And Fraction2.IsNull Then Return True
         If (Fraction1 / Fraction2).IsUnit Then Return True
         Return False
     End Operator
@@ -210,23 +220,35 @@ Public Structure Fraction
         Return True
     End Operator
     Public Shared Operator >(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
+        If Fraction2.IsNull Then
+            If Fraction1.IsNegitive Then
+                Return False
+            Else
+                Return True
+            End If
+        End If
         Dim Division = Fraction1 / Fraction2
         If Division.Numerator > Division.Denominator Then Return True
         Return False
     End Operator
     Public Shared Operator <(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
+        If Fraction2.IsNull Then
+            If Fraction1.IsNegitive Then
+                Return True
+            Else
+                Return False
+            End If
+        End If
         Dim Division = Fraction1 / Fraction2
         If Division.Numerator < Division.Denominator Then Return True
         Return False
     End Operator
     Public Shared Operator >=(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        Dim Division = Fraction1 / Fraction2
-        If Division.Numerator > Division.Denominator Or Division.IsUnit Then Return True
+        If Fraction1 > Fraction2 Or Fraction1 = Fraction2 Then Return True
         Return False
     End Operator
     Public Shared Operator <=(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        Dim Division = Fraction1 / Fraction2
-        If Division.Numerator < Division.Denominator Or Division.IsUnit Then Return True
+        If Fraction1 < Fraction2 Or Fraction1 = Fraction2 Then Return True
         Return False
     End Operator
 
