@@ -1,5 +1,6 @@
 Imports System.Numerics
 Public Structure Fraction
+    Implements IComparable, IComparable(Of Fraction), IEquatable(Of Fraction)
     Private _Numerator As BigInteger
     Private _Denominator As BigInteger
     Public Property Numerator As BigInteger
@@ -157,6 +158,20 @@ Public Structure Fraction
             Me.ProperFraction = Reduced
         End If
     End Sub
+
+    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+        Dim f As Fraction = obj
+        If Me = f Then Return True
+        Return False
+    End Function
+    Public Function CompareTo(other As Fraction) As Integer Implements IComparable(Of Fraction).CompareTo
+        If Me = other Then Return True
+        Return False
+    End Function
+    Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
+        If Me = other Then Return True
+        Return False
+    End Function
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
         Me._Numerator = Numerator
