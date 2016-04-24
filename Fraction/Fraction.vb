@@ -27,8 +27,8 @@ Public Structure Fraction
             Return BigInteger.Divide(Numerator, Denominator)
         End Get
         Set(value As BigInteger)
-            Dim ProperFraction = Me.ProperFraction
-            Dim Fraction = ProperFraction + value
+            Dim pf = ProperFraction
+            Dim Fraction = pf + value
             _Numerator = Fraction.Numerator
             _Denominator = Fraction.Denominator
             Simplify()
@@ -40,8 +40,8 @@ Public Structure Fraction
             Return New Fraction(Numerator Mod Denominator, Denominator)
         End Get
         Set(value As Fraction)
-            Dim WholeNumber = Me.WholeNumber
-            Dim Fraction = WholeNumber + value
+            Dim wn = WholeNumber
+            Dim Fraction = wn + value
             _Numerator = Fraction.Numerator
             _Denominator = Fraction.Denominator
             Simplify()
@@ -102,7 +102,7 @@ Public Structure Fraction
             Value += BigInteger.Divide(Numerator, Denominator).ToString
             Numerator = Numerator Mod Denominator
         Next
-        If Me.IsNegitive Then
+        If IsNegitive Then
             Return "-" + Value
         Else
             Return Value
@@ -128,16 +128,16 @@ Public Structure Fraction
             _Denominator = 1
         Else
             Dim GDC = Fraction.GCD(Numerator, Denominator)
-            Me._Numerator = Numerator / GDC
-            Me._Denominator = Denominator / GDC
+            _Numerator = Numerator / GDC
+            _Denominator = Denominator / GDC
         End If
     End Sub
     Public Sub Reduce(Optional Change As Long = 1)
-        Me.Reduce(Change, Change)
+        Reduce(Change, Change)
     End Sub
     Public Sub Reduce(ChangeInNumerator As Long, ChangeInDenominator As Long)
         Dim IsNegitive As Boolean = False
-        Dim Proper As Fraction = Me.ProperFraction
+        Dim Proper As Fraction = ProperFraction
         If Proper < 0 Then
             IsNegitive = True
             Proper = Proper.Absolute
@@ -153,9 +153,9 @@ Public Structure Fraction
             Next
         Next
         If IsNegitive = True Then
-            Me.ProperFraction = -Reduced
+            ProperFraction = -Reduced
         Else
-            Me.ProperFraction = Reduced
+            ProperFraction = Reduced
         End If
     End Sub
 
@@ -171,32 +171,32 @@ Public Structure Fraction
     End Function
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
-        Me._Numerator = Numerator
-        Me._Denominator = Denominator
+        _Numerator = Numerator
+        _Denominator = Denominator
         Simplify()
     End Sub
     Sub New(Number As BigInteger)
-        Me._Numerator = Number
-        Me._Denominator = 1
+        _Numerator = Number
+        _Denominator = 1
     End Sub
     Sub New(WholeNumber As BigInteger, ProperFraction As Fraction)
-        Me._Numerator = WholeNumber * ProperFraction.Denominator + ProperFraction.Numerator
-        Me._Denominator = ProperFraction.Denominator
+        _Numerator = WholeNumber * ProperFraction.Denominator + ProperFraction.Numerator
+        _Denominator = ProperFraction.Denominator
     End Sub
     Sub New(Value As String)
-        Dim Fraction As Fraction = Fraction.Parse(Value)
-        Me._Numerator = Fraction.Numerator
-        Me._Denominator = Fraction.Denominator
+        Dim Fraction As Fraction = Parse(Value)
+        _Numerator = Fraction.Numerator
+        _Denominator = Fraction.Denominator
         Simplify()
     End Sub
     Sub New(Number As Decimal)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
     Sub New(Number As Double)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
     Sub New(Number As Single)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
 
     Public Shared Operator +(Fraction1 As Fraction, Fraction2 As Fraction) As Fraction
