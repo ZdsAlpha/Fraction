@@ -49,8 +49,7 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsProper As Boolean
         Get
-            If BigInteger.Abs(Numerator) < Denominator Then Return True
-            Return False
+            Return BigInteger.Abs(Numerator) < Denominator
         End Get
     End Property
     Public ReadOnly Property IsImproper As Boolean
@@ -60,26 +59,26 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsNull As Boolean
         Get
-            If Numerator = 0 Then Return True
-            Return False
+            Return Numerator = 0
+
         End Get
     End Property
     Public ReadOnly Property IsUnit As Boolean
         Get
-            If Numerator = 1 And Denominator = 1 Then Return True
+            Return Numerator = 1 AndAlso Denominator = 1
             Return False
         End Get
     End Property
     Public ReadOnly Property IsNegitive As Boolean
         Get
-            If Numerator < 0 Then Return True
-            Return False
+            Return Numerator < 0
+
         End Get
     End Property
     Public ReadOnly Property IsUndefined As Boolean
         Get
-            If Denominator = 0 Then Return True
-            Return False
+            Return Denominator = 0
+
         End Get
     End Property
     Public ReadOnly Property Absolute As Fraction
@@ -180,8 +179,7 @@ Public Structure Fraction
     End Function
 
     Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
-        If Me = other Then Return True
-        Return False
+        Return Me = other
     End Function
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
