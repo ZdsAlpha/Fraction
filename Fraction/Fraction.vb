@@ -376,7 +376,7 @@ Public Structure Fraction
     End Function
     Public Shared Function TryParse(Value As String, ByRef Result As Fraction) As Boolean
         If Value Is Nothing OrElse Value = "" Then Return False
-        Value = Value.Trim(" ")
+        Value = Value.Trim(" "c)
         Dim IsConverted As Boolean
         If Value.Contains("/") Then
             Dim Array() = Value.Split("/"c)
