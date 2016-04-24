@@ -223,7 +223,7 @@ Public Structure Fraction
     Public Shared Operator /(Fraction1 As Fraction, Fraction2 As Fraction) As Fraction
         Return New Fraction(BigInteger.Multiply(Fraction1.Numerator, Fraction2.Denominator), BigInteger.Multiply(Fraction1.Denominator, Fraction2.Numerator))
     End Operator
-    Public Shared Operator ^(Fraction As Fraction, Power As Long) As Fraction
+    Public Shared Operator ^(Fraction As Fraction, Power As Integer) As Fraction
         If Power > 0 Then
             Return New Fraction(BigInteger.Pow(Fraction.Numerator, Power), BigInteger.Pow(Fraction.Denominator, Power))
         ElseIf Power < 0 Then
@@ -315,28 +315,28 @@ Public Structure Fraction
     End Operator
 
     Public Shared Widening Operator CType(Fraction As Fraction) As Byte
-        Return Fraction.WholeNumber
+        Return CByte(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As SByte
-        Return Fraction.WholeNumber
+        Return CSByte(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As Short
-        Return Fraction.WholeNumber
+        Return CShort(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As UShort
-        Return Fraction.WholeNumber
+        Return CUShort(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As Integer
-        Return Fraction.WholeNumber
+        Return CInt(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As UInteger
-        Return Fraction.WholeNumber
+        Return CUInt(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As Long
-        Return Fraction.WholeNumber
+        Return CLng(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As ULong
-        Return Fraction.WholeNumber
+        Return CULng(Fraction.WholeNumber)
     End Operator
     Public Shared Widening Operator CType(Fraction As Fraction) As Single
         Return Single.Parse(Fraction.ToString(10))
@@ -376,7 +376,7 @@ Public Structure Fraction
         Value = Value.Trim(" ")
         Dim IsConverted As Boolean
         If Value.Contains("/") Then
-            Dim Array() = Value.Split("/")
+            Dim Array() = Value.Split("/"c)
             If Array.Length <> 2 Then Return False
             Dim Numerator As BigInteger = 0
             Dim Denominator As BigInteger = 0
@@ -388,7 +388,7 @@ Public Structure Fraction
         ElseIf Value.Contains(".") Then
             Dim IsNegitive As Boolean = False
             If Value(0) = "-" Then IsNegitive = True
-            Dim Array() = Value.Split(".")
+            Dim Array() = Value.Split("."c)
             If Array.Length <> 2 Then Return False
             If Array(1).Contains("-") Then Return False
             Dim WholeNumber As BigInteger = 0
