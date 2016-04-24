@@ -110,9 +110,9 @@ Public Structure Fraction
     End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
-        Me._Numerator = Numerator
-        Me._Denominator = Denominator
-        Me.Simplify()
+        _Numerator = Numerator
+        _Denominator = Denominator
+        Simplify()
     End Sub
     Public Sub Simplify()
         If Denominator = 0 Then
@@ -147,8 +147,8 @@ Public Structure Fraction
             For CID As Long = -ChangeInDenominator To ChangeInDenominator
                 Dim Fraction = (New Fraction(Proper.Numerator + CIN, Proper.Denominator + CID)).Absolute
                 If _
-                    Fraction.Numerator < Reduced.Numerator And
-                    Fraction.Denominator < Reduced.Denominator And
+                    Fraction.Numerator < Reduced.Numerator AndAlso
+                    Fraction.Denominator < Reduced.Denominator AndAlso
                     Not Fraction.IsUndefined Then Reduced = Fraction
             Next
         Next
@@ -360,11 +360,12 @@ Public Structure Fraction
         Return First
     End Function
     Public Shared Function TryParse(Value As String, ByRef Result As Fraction) As Boolean
+        If Value Is Nothing OrElse Value = "" Then Return False
         Value = Value.Trim(" ")
+        Dim IsConverted As Boolean
         If Value.Contains("/") Then
             Dim Array() = Value.Split("/")
             If Array.Length <> 2 Then Return False
-            Dim IsConverted As Boolean
             Dim Numerator As BigInteger = 0
             Dim Denominator As BigInteger = 0
             IsConverted = BigInteger.TryParse(Array(0), Numerator)
@@ -378,7 +379,6 @@ Public Structure Fraction
             Dim Array() = Value.Split(".")
             If Array.Length <> 2 Then Return False
             If Array(1).Contains("-") Then Return False
-            Dim IsConverted As Boolean
             Dim WholeNumber As BigInteger = 0
             If Array(0) <> "" Then
                 IsConverted = BigInteger.TryParse(Array(0), WholeNumber)
@@ -400,7 +400,6 @@ Public Structure Fraction
                 Result = New Fraction(WholeNumber, Proper)
             End If
         Else
-            Dim IsConverted As Boolean
             Dim Number As BigInteger = 0
             IsConverted = BigInteger.TryParse(Value, Number)
             If IsConverted = False Then Return False
@@ -413,7 +412,7 @@ Public Structure Fraction
         Dim IsConverted As Boolean
         IsConverted = TryParse(Value, Fraction)
         If IsConverted = False Then
-            Throw New Exception("Invalid format. Unable to convert " + Value.ToString + " to fraction.")
+            Throw New FormatException("Invalid format. Unable to convert " + Value.ToString + " to fraction.")
         Else
             Return Fraction
         End If
