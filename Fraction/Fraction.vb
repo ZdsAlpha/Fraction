@@ -1,4 +1,6 @@
 Imports System.Numerics
+Imports System.Text
+
 Public Structure Fraction
     Implements IComparable, IComparable(Of Fraction), IEquatable(Of Fraction)
     Private _Numerator As BigInteger
@@ -91,21 +93,22 @@ Public Structure Fraction
         Return _Numerator.ToString + "/" + _Denominator.ToString
     End Function
     Public Shadows Function ToString(DigitsAfterPoint As ULong) As String
+        Dim sb As New StringBuilder
+
+
         Dim Whole As BigInteger = BigInteger.Abs(WholeNumber)
         Dim Proper As Fraction = ProperFraction.Absolute
-        Dim Value As String = Whole.ToString + "."
+        sb.AppendFormat("{0}.", Whole.ToString)
         Dim Numerator As BigInteger = Proper.Numerator
         Dim Denominator As BigInteger = Proper.Denominator
         For i = 0 To DigitsAfterPoint - 1
             Numerator = Numerator * 10
-            Value += BigInteger.Divide(Numerator, Denominator).ToString
+            sb.Append(BigInteger.Divide(Numerator, Denominator).ToString)
             Numerator = Numerator Mod Denominator
         Next
-        If IsNegitive Then
-            Return "-" + Value
-        Else
-            Return Value
-        End If
+        If IsNegitive Then sb.Insert(0, "-")
+        Return sb.ToString
+
     End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
