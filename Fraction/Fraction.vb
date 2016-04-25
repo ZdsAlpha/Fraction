@@ -1,6 +1,5 @@
 Imports System.Numerics
 Imports System.Text
-
 Public Structure Fraction
     Implements IComparable, IComparable(Of Fraction), IEquatable(Of Fraction)
     Private _Numerator As BigInteger
@@ -94,8 +93,6 @@ Public Structure Fraction
     End Function
     Public Shadows Function ToString(DigitsAfterPoint As ULong) As String
         Dim sb As New StringBuilder
-
-
         Dim Whole As BigInteger = BigInteger.Abs(WholeNumber)
         Dim Proper As Fraction = ProperFraction.Absolute
         sb.AppendFormat("{0}.", Whole.ToString)
@@ -180,7 +177,6 @@ Public Structure Fraction
             Return -1
         End If
     End Function
-
     Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
         Return Me = other
     End Function
