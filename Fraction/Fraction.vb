@@ -61,25 +61,21 @@ Public Structure Fraction
     Public ReadOnly Property IsNull As Boolean
         Get
             Return Numerator = 0
-
         End Get
     End Property
     Public ReadOnly Property IsUnit As Boolean
         Get
             Return Numerator = 1 AndAlso Denominator = 1
-            Return False
         End Get
     End Property
     Public ReadOnly Property IsNegitive As Boolean
         Get
             Return Numerator < 0
-
         End Get
     End Property
     Public ReadOnly Property IsUndefined As Boolean
         Get
             Return Denominator = 0
-
         End Get
     End Property
     Public ReadOnly Property Absolute As Fraction
@@ -105,7 +101,6 @@ Public Structure Fraction
         Next
         If IsNegitive Then sb.Insert(0, "-")
         Return sb.ToString
-
     End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
@@ -165,9 +160,6 @@ Public Structure Fraction
         Else
             Throw New ArgumentException(String.Format("{0} is not a {1}", NameOf(obj), [GetType].FullName))
         End If
-
-
-
     End Function
     Public Function CompareTo(other As Fraction) As Integer Implements IComparable(Of Fraction).CompareTo
         If Me = other Then Return 0
