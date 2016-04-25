@@ -1,4 +1,6 @@
 Imports System.Numerics
+Imports System.Text
+
 Public Structure Fraction
     Implements IComparable, IComparable(Of Fraction), IEquatable(Of Fraction)
     Private _Numerator As BigInteger
@@ -27,8 +29,8 @@ Public Structure Fraction
             Return BigInteger.Divide(Numerator, Denominator)
         End Get
         Set(value As BigInteger)
-            Dim ProperFraction = Me.ProperFraction
-            Dim Fraction = ProperFraction + value
+            Dim pf = ProperFraction
+            Dim Fraction = pf + value
             _Numerator = Fraction.Numerator
             _Denominator = Fraction.Denominator
             Simplify()
@@ -40,8 +42,8 @@ Public Structure Fraction
             Return New Fraction(Numerator Mod Denominator, Denominator)
         End Get
         Set(value As Fraction)
-            Dim WholeNumber = Me.WholeNumber
-            Dim Fraction = WholeNumber + value
+            Dim wn = WholeNumber
+            Dim Fraction = wn + value
             _Numerator = Fraction.Numerator
             _Denominator = Fraction.Denominator
             Simplify()
@@ -49,8 +51,7 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsProper As Boolean
         Get
-            If BigInteger.Abs(Numerator) < Denominator Then Return True
-            Return False
+            Return BigInteger.Abs(Numerator) < Denominator
         End Get
     End Property
     Public ReadOnly Property IsImproper As Boolean
@@ -60,26 +61,26 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsNull As Boolean
         Get
-            If Numerator = 0 Then Return True
-            Return False
+            Return Numerator = 0
+
         End Get
     End Property
     Public ReadOnly Property IsUnit As Boolean
         Get
-            If Numerator = 1 And Denominator = 1 Then Return True
+            Return Numerator = 1 AndAlso Denominator = 1
             Return False
         End Get
     End Property
     Public ReadOnly Property IsNegitive As Boolean
         Get
-            If Numerator < 0 Then Return True
-            Return False
+            Return Numerator < 0
+
         End Get
     End Property
     Public ReadOnly Property IsUndefined As Boolean
         Get
-            If Denominator = 0 Then Return True
-            Return False
+            Return Denominator = 0
+
         End Get
     End Property
     Public ReadOnly Property Absolute As Fraction
@@ -92,21 +93,22 @@ Public Structure Fraction
         Return _Numerator.ToString + "/" + _Denominator.ToString
     End Function
     Public Shadows Function ToString(DigitsAfterPoint As ULong) As String
+        Dim sb As New StringBuilder
+
+
         Dim Whole As BigInteger = BigInteger.Abs(WholeNumber)
         Dim Proper As Fraction = ProperFraction.Absolute
-        Dim Value As String = Whole.ToString + "."
+        sb.AppendFormat("{0}.", Whole.ToString)
         Dim Numerator As BigInteger = Proper.Numerator
         Dim Denominator As BigInteger = Proper.Denominator
         For i = 0 To DigitsAfterPoint - 1
             Numerator = Numerator * 10
-            Value += BigInteger.Divide(Numerator, Denominator).ToString
+            sb.Append(BigInteger.Divide(Numerator, Denominator).ToString)
             Numerator = Numerator Mod Denominator
         Next
-        If Me.IsNegitive Then
-            Return "-" + Value
-        Else
-            Return Value
-        End If
+        If IsNegitive Then sb.Insert(0, "-")
+        Return sb.ToString
+
     End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
@@ -128,16 +130,16 @@ Public Structure Fraction
             _Denominator = 1
         Else
             Dim GDC = Fraction.GCD(Numerator, Denominator)
-            Me._Numerator = Numerator / GDC
-            Me._Denominator = Denominator / GDC
+            _Numerator = Numerator / GDC
+            _Denominator = Denominator / GDC
         End If
     End Sub
     Public Sub Reduce(Optional Change As Long = 1)
-        Me.Reduce(Change, Change)
+        Reduce(Change, Change)
     End Sub
     Public Sub Reduce(ChangeInNumerator As Long, ChangeInDenominator As Long)
         Dim IsNegitive As Boolean = False
-        Dim Proper As Fraction = Me.ProperFraction
+        Dim Proper As Fraction = ProperFraction
         If Proper < 0 Then
             IsNegitive = True
             Proper = Proper.Absolute
@@ -153,50 +155,63 @@ Public Structure Fraction
             Next
         Next
         If IsNegitive = True Then
-            Me.ProperFraction = -Reduced
+            ProperFraction = -Reduced
         Else
-            Me.ProperFraction = Reduced
+            ProperFraction = Reduced
         End If
     End Sub
 
     Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-        Return Me.CompareTo(obj)
+        If obj Is Nothing Then Return 1
+        If TypeOf obj Is Fraction Then
+            Return CompareTo(CType(obj, Fraction))
+        Else
+            Throw New ArgumentException(String.Format("{0} is not a {1}", NameOf(obj), [GetType].FullName))
+        End If
+
+
+
     End Function
     Public Function CompareTo(other As Fraction) As Integer Implements IComparable(Of Fraction).CompareTo
-        Return Me.WholeNumber - other.WholeNumber
+        If Me = other Then Return 0
+        If Me > other Then
+            Return 1
+        Else
+            Return -1
+        End If
     End Function
+
     Public Overloads Function Equals(other As Fraction) As Boolean Implements IEquatable(Of Fraction).Equals
-        If Me = other Then Return True
-        Return False
+        Return Me = other
     End Function
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
-        Me._Numerator = Numerator
-        Me._Denominator = Denominator
+        _Numerator = Numerator
+        _Denominator = Denominator
         Simplify()
     End Sub
     Sub New(Number As BigInteger)
-        Me._Numerator = Number
-        Me._Denominator = 1
+        _Numerator = Number
+        _Denominator = 1
     End Sub
     Sub New(WholeNumber As BigInteger, ProperFraction As Fraction)
-        Me._Numerator = WholeNumber * ProperFraction.Denominator + ProperFraction.Numerator
-        Me._Denominator = ProperFraction.Denominator
+        _Numerator = WholeNumber * ProperFraction.Denominator + ProperFraction.Numerator
+        _Denominator = ProperFraction.Denominator
     End Sub
     Sub New(Value As String)
-        Dim Fraction As Fraction = Fraction.Parse(Value)
-        Me._Numerator = Fraction.Numerator
-        Me._Denominator = Fraction.Denominator
+        Dim Fraction As Fraction = Parse(Value)
+        _Numerator = Fraction.Numerator
+        _Denominator = Fraction.Denominator
         Simplify()
     End Sub
     Sub New(Number As Decimal)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
     Sub New(Number As Double)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
     Sub New(Number As Single)
-        Me.New(Number.ToString)
+        MyClass.New(Number.ToString)
     End Sub
 
     Public Shared Operator +(Fraction1 As Fraction, Fraction2 As Fraction) As Fraction
@@ -211,7 +226,7 @@ Public Structure Fraction
     Public Shared Operator /(Fraction1 As Fraction, Fraction2 As Fraction) As Fraction
         Return New Fraction(BigInteger.Multiply(Fraction1.Numerator, Fraction2.Denominator), BigInteger.Multiply(Fraction1.Denominator, Fraction2.Numerator))
     End Operator
-    Public Shared Operator ^(Fraction As Fraction, Power As Long) As Fraction
+    Public Shared Operator ^(Fraction As Fraction, Power As Integer) As Fraction
         If Power > 0 Then
             Return New Fraction(BigInteger.Pow(Fraction.Numerator, Power), BigInteger.Pow(Fraction.Denominator, Power))
         ElseIf Power < 0 Then
@@ -302,34 +317,34 @@ Public Structure Fraction
         Return Fraction.Parse(Number.ToString)
     End Operator
 
-    Public Shared Widening Operator CType(Fraction As Fraction) As Byte
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Byte
+        Return CByte(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As SByte
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As SByte
+        Return CSByte(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Short
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Short
+        Return CShort(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As UShort
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As UShort
+        Return CUShort(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Integer
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Integer
+        Return CInt(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As UInteger
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As UInteger
+        Return CUInt(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Long
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Long
+        Return CLng(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As ULong
-        Return Fraction.WholeNumber
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As ULong
+        Return CULng(Fraction.WholeNumber)
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Single
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Single
         Return Single.Parse(Fraction.ToString(10))
     End Operator
-    Public Shared Widening Operator CType(Fraction As Fraction) As Double
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Double
         Return Single.Parse(Fraction.ToString(20))
     End Operator
 
@@ -361,36 +376,36 @@ Public Structure Fraction
     End Function
     Public Shared Function TryParse(Value As String, ByRef Result As Fraction) As Boolean
         If Value Is Nothing OrElse Value = "" Then Return False
-        Value = Value.Trim(" ")
+        Value = Value.Trim(" "c)
         Dim IsConverted As Boolean
         If Value.Contains("/") Then
-            Dim Array() = Value.Split("/")
-            If Array.Length <> 2 Then Return False
+            Dim tmp() = Value.Split("/"c)
+            If tmp.Length <> 2 Then Return False
             Dim Numerator As BigInteger = 0
             Dim Denominator As BigInteger = 0
-            IsConverted = BigInteger.TryParse(Array(0), Numerator)
+            IsConverted = BigInteger.TryParse(tmp(0), Numerator)
             If IsConverted = False Then Return False
-            IsConverted = BigInteger.TryParse(Array(1), Denominator)
+            IsConverted = BigInteger.TryParse(tmp(1), Denominator)
             If IsConverted = False Then Return False
             Result = New Fraction(Numerator, Denominator)
         ElseIf Value.Contains(".") Then
             Dim IsNegitive As Boolean = False
             If Value(0) = "-" Then IsNegitive = True
-            Dim Array() = Value.Split(".")
-            If Array.Length <> 2 Then Return False
-            If Array(1).Contains("-") Then Return False
+            Dim tmp() = Value.Split("."c)
+            If tmp.Length <> 2 Then Return False
+            If tmp(1).Contains("-") Then Return False
             Dim WholeNumber As BigInteger = 0
-            If Array(0) <> "" Then
-                IsConverted = BigInteger.TryParse(Array(0), WholeNumber)
+            If tmp(0) <> "" Then
+                IsConverted = BigInteger.TryParse(tmp(0), WholeNumber)
                 If IsConverted = False Then Return False
                 WholeNumber = BigInteger.Abs(WholeNumber)
             End If
             Dim ProperNumerator As BigInteger = 0
-            IsConverted = BigInteger.TryParse(Array(1), ProperNumerator)
+            IsConverted = BigInteger.TryParse(tmp(1), ProperNumerator)
             If IsConverted = False Then Return False
-            Dim ProperDenominator(Array(1).Length) As Char
+            Dim ProperDenominator(tmp(1).Length) As Char
             ProperDenominator(0) = "1"c
-            For i = 1 To Array(1).Length
+            For i = 1 To tmp(1).Length
                 ProperDenominator(i) = "0"c
             Next
             Dim Proper As New Fraction(ProperNumerator, BigInteger.Parse(ProperDenominator))

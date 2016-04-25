@@ -234,3 +234,13 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
+*.exe
+*.bak
+*.cache
+*.lib
+obj/
+[Tt]est[Rr]esult*
