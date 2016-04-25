@@ -143,7 +143,8 @@ Public Structure Fraction
                 If _
                     Fraction.Numerator < Reduced.Numerator AndAlso
                     Fraction.Denominator < Reduced.Denominator AndAlso
-                    Not Fraction.IsUndefined Then Reduced = Fraction
+                    Not Fraction.IsUndefined AndAlso
+                    Not Fraction.Denominator = 1 Then Reduced = Fraction
             Next
         Next
         If IsNegitive = True Then

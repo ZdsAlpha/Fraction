@@ -164,7 +164,7 @@ public struct Fraction : IComparable, IComparable<Fraction>, IEquatable<Fraction
             for (long CID = -ChangeInDenominator; CID <= ChangeInDenominator; CID++)
             {
                 Fraction Fraction = (new Fraction(Proper.Numerator + CIN, Proper.Denominator + CID)).Absolute;
-                if (Fraction.Numerator < Reduced.Numerator && Fraction.Denominator < Reduced.Denominator && !Fraction.IsUndefined)
+                if (Fraction.Numerator < Reduced.Numerator && Fraction.Denominator < Reduced.Denominator && !Fraction.IsUndefined && !(Fraction.Denominator==1))
                     Reduced = Fraction;
             }
         }
