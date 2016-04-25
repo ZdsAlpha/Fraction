@@ -379,33 +379,33 @@ Public Structure Fraction
         Value = Value.Trim(" "c)
         Dim IsConverted As Boolean
         If Value.Contains("/") Then
-            Dim Array() = Value.Split("/"c)
-            If Array.Length <> 2 Then Return False
+            Dim tmp() = Value.Split("/"c)
+            If tmp.Length <> 2 Then Return False
             Dim Numerator As BigInteger = 0
             Dim Denominator As BigInteger = 0
-            IsConverted = BigInteger.TryParse(Array(0), Numerator)
+            IsConverted = BigInteger.TryParse(tmp(0), Numerator)
             If IsConverted = False Then Return False
-            IsConverted = BigInteger.TryParse(Array(1), Denominator)
+            IsConverted = BigInteger.TryParse(tmp(1), Denominator)
             If IsConverted = False Then Return False
             Result = New Fraction(Numerator, Denominator)
         ElseIf Value.Contains(".") Then
             Dim IsNegitive As Boolean = False
             If Value(0) = "-" Then IsNegitive = True
-            Dim Array() = Value.Split("."c)
-            If Array.Length <> 2 Then Return False
-            If Array(1).Contains("-") Then Return False
+            Dim tmp() = Value.Split("."c)
+            If tmp.Length <> 2 Then Return False
+            If tmp(1).Contains("-") Then Return False
             Dim WholeNumber As BigInteger = 0
-            If Array(0) <> "" Then
-                IsConverted = BigInteger.TryParse(Array(0), WholeNumber)
+            If tmp(0) <> "" Then
+                IsConverted = BigInteger.TryParse(tmp(0), WholeNumber)
                 If IsConverted = False Then Return False
                 WholeNumber = BigInteger.Abs(WholeNumber)
             End If
             Dim ProperNumerator As BigInteger = 0
-            IsConverted = BigInteger.TryParse(Array(1), ProperNumerator)
+            IsConverted = BigInteger.TryParse(tmp(1), ProperNumerator)
             If IsConverted = False Then Return False
-            Dim ProperDenominator(Array(1).Length) As Char
+            Dim ProperDenominator(tmp(1).Length) As Char
             ProperDenominator(0) = "1"c
-            For i = 1 To Array(1).Length
+            For i = 1 To tmp(1).Length
                 ProperDenominator(i) = "0"c
             Next
             Dim Proper As New Fraction(ProperNumerator, BigInteger.Parse(ProperDenominator))
