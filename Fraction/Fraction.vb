@@ -70,7 +70,7 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsNegitive As Boolean
         Get
-            Return Numerator < 0
+            Return Numerator < 0 Or Denominator < 0
         End Get
     End Property
     Public ReadOnly Property IsUndefined As Boolean
@@ -236,28 +236,30 @@ Public Structure Fraction
         Return True
     End Operator
     Public Shared Operator >(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        If Fraction2.IsNull Then
-            If Fraction1.IsNegitive Then
-                Return False
-            Else
-                Return True
-            End If
+        If Fraction2.IsNull Then If Fraction1.IsNegitive Then Return False Else Return True
+        If Fraction1.IsNegitive And Not Fraction2.IsNegitive Then
+            Return False
+        ElseIf Not Fraction1.IsNegitive And Fraction2.IsNegitive Then
+            Return True
+        ElseIf Fraction1.IsNegitive And Fraction2.IsNegitive Then
+            Return Fraction1.Absolute < Fraction2.Absolute
+        Else
+            Dim Division = Fraction1 / Fraction2
+            Return Division.Numerator > Division.Denominator
         End If
-        Dim Division = Fraction1 / Fraction2
-        If Division.Numerator > Division.Denominator Then Return True
-        Return False
     End Operator
     Public Shared Operator <(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        If Fraction2.IsNull Then
-            If Fraction1.IsNegitive Then
-                Return True
-            Else
-                Return False
-            End If
+        If Fraction2.IsNull Then If Fraction1.IsNegitive Then Return True Else Return False
+        If Fraction1.IsNegitive And Not Fraction2.IsNegitive Then
+            Return True
+        ElseIf Not Fraction1.IsNegitive And Fraction2.IsNegitive Then
+            Return False
+        ElseIf Fraction1.IsNegitive And Fraction2.IsNegitive Then
+            Return Fraction1.Absolute > Fraction2.Absolute
+        Else
+            Dim Division = Fraction1 / Fraction2
+            Return Division.Numerator < Division.Denominator
         End If
-        Dim Division = Fraction1 / Fraction2
-        If Division.Numerator < Division.Denominator Then Return True
-        Return False
     End Operator
     Public Shared Operator >=(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
         If Fraction1 > Fraction2 Or Fraction1 = Fraction2 Then Return True

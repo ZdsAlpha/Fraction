@@ -289,36 +289,51 @@ public struct Fraction : IComparable, IComparable<Fraction>, IEquatable<Fraction
     public static bool operator >(Fraction Fraction1, Fraction Fraction2)
     {
         if (Fraction2.IsNull)
-        {
             if (Fraction1.IsNegitive)
-            {
                 return false;
-            }
-            else {
+            else
                 return true;
-            }
+        if (Fraction1.IsNegitive & !Fraction2.IsNegitive)
+        {
+            return false;
         }
-        Fraction Division = Fraction1 / Fraction2;
-        if (Division.Numerator > Division.Denominator)
+        else if (!Fraction1.IsNegitive & Fraction2.IsNegitive)
+        {
             return true;
-        return false;
+        }
+        else if (Fraction1.IsNegitive & Fraction2.IsNegitive)
+        {
+            return Fraction1.Absolute < Fraction2.Absolute;
+        }
+        else {
+            Fraction Division = Fraction1 / Fraction2;
+            return Division.Numerator > Division.Denominator;
+        }
     }
     public static bool operator <(Fraction Fraction1, Fraction Fraction2)
     {
+
         if (Fraction2.IsNull)
-        {
             if (Fraction1.IsNegitive)
-            {
                 return true;
-            }
-            else {
+            else
                 return false;
-            }
-        }
-        Fraction Division = Fraction1 / Fraction2;
-        if (Division.Numerator < Division.Denominator)
+        if (Fraction1.IsNegitive & !Fraction2.IsNegitive)
+        {
             return true;
-        return false;
+        }
+        else if (!Fraction1.IsNegitive & Fraction2.IsNegitive)
+        {
+            return false;
+        }
+        else if (Fraction1.IsNegitive & Fraction2.IsNegitive)
+        {
+            return Fraction1.Absolute > Fraction2.Absolute;
+        }
+        else {
+            Fraction Division = Fraction1 / Fraction2;
+            return Division.Numerator < Division.Denominator;
+        }
     }
     public static bool operator >=(Fraction Fraction1, Fraction Fraction2)
     {
