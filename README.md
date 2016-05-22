@@ -3,7 +3,7 @@ Best solution if you are dealing with fraction. It is implemented over BigIntege
 
 ----------
 
-## Fratures ##
+## Features ##
 
  1. Automatically simplifies fraction into its reduced form.
  2. Fraction can be represented in form of Mixed Fraction. Get or Set Fraction.WholeNumber or Fraction.ProperFraction property.
