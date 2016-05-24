@@ -10,7 +10,7 @@ Public Structure Fraction
         End Get
         Set(value As BigInteger)
             _Numerator = value
-            Simplify()
+            If AutoSimplify Then Simplify()
         End Set
     End Property
     Public Property Denominator As BigInteger
@@ -19,7 +19,7 @@ Public Structure Fraction
         End Get
         Set(value As BigInteger)
             _Denominator = value
-            Simplify()
+            If AutoSimplify Then Simplify()
         End Set
     End Property
     Public Property WholeNumber As BigInteger
@@ -28,11 +28,7 @@ Public Structure Fraction
             Return BigInteger.Divide(Numerator, Denominator)
         End Get
         Set(value As BigInteger)
-            Dim pf = ProperFraction
-            Dim Fraction = pf + value
-            _Numerator = Fraction.Numerator
-            _Denominator = Fraction.Denominator
-            Simplify()
+            SetValue(ProperFraction + value)
         End Set
     End Property
     Public Property ProperFraction As Fraction
@@ -41,11 +37,7 @@ Public Structure Fraction
             Return New Fraction(Numerator Mod Denominator, Denominator)
         End Get
         Set(value As Fraction)
-            Dim wn = WholeNumber
-            Dim Fraction = wn + value
-            _Numerator = Fraction.Numerator
-            _Denominator = Fraction.Denominator
-            Simplify()
+            SetValue(WholeNumber + value)
         End Set
     End Property
     Public ReadOnly Property IsProper As Boolean
@@ -65,12 +57,12 @@ Public Structure Fraction
     End Property
     Public ReadOnly Property IsUnit As Boolean
         Get
-            Return Numerator = 1 AndAlso Denominator = 1
+            Return Numerator = Denominator
         End Get
     End Property
     Public ReadOnly Property IsNegitive As Boolean
         Get
-            Return Numerator < 0 Or Denominator < 0
+            Return (Numerator < 0 Or Denominator < 0) And Not (Numerator < 0 And Denominator < 0)
         End Get
     End Property
     Public ReadOnly Property IsUndefined As Boolean
@@ -83,11 +75,17 @@ Public Structure Fraction
             Return New Fraction(BigInteger.Abs(Numerator), BigInteger.Abs(Denominator))
         End Get
     End Property
+    Public ReadOnly Property Inverse As Fraction
+        Get
+            Return New Fraction(Denominator, Numerator)
+        End Get
+    End Property
 
     Public Shadows Function ToString() As String
         Return _Numerator.ToString + "/" + _Denominator.ToString
     End Function
     Public Shadows Function ToString(DigitsAfterPoint As ULong) As String
+        If IsUndefined Then Return "Undefined"
         Dim sb As New StringBuilder
         Dim Whole As BigInteger = BigInteger.Abs(WholeNumber)
         Dim Proper As Fraction = ProperFraction.Absolute
@@ -106,7 +104,10 @@ Public Structure Fraction
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
         _Numerator = Numerator
         _Denominator = Denominator
-        Simplify()
+        If AutoSimplify Then Simplify()
+    End Sub
+    Public Sub SetValue(Fraction As Fraction)
+        SetValue(Fraction.Numerator, Fraction.Denominator)
     End Sub
     Public Sub Simplify()
         If Denominator = 0 Then
@@ -140,6 +141,7 @@ Public Structure Fraction
         For CIN As Long = -ChangeInNumerator To ChangeInNumerator
             For CID As Long = -ChangeInDenominator To ChangeInDenominator
                 Dim Fraction = (New Fraction(Proper.Numerator + CIN, Proper.Denominator + CID)).Absolute
+                If AutoSimplify = False Then Fraction.Simplify()
                 If _
                     Fraction.Numerator < Reduced.Numerator AndAlso
                     Fraction.Denominator < Reduced.Denominator AndAlso
@@ -174,23 +176,17 @@ Public Structure Fraction
     End Function
 
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
-        _Numerator = Numerator
-        _Denominator = Denominator
-        Simplify()
+        SetValue(Numerator, Denominator)
     End Sub
     Sub New(Number As BigInteger)
-        _Numerator = Number
-        _Denominator = 1
+        SetValue(Number, 1)
     End Sub
     Sub New(WholeNumber As BigInteger, ProperFraction As Fraction)
         _Numerator = WholeNumber * ProperFraction.Denominator + ProperFraction.Numerator
         _Denominator = ProperFraction.Denominator
     End Sub
     Sub New(Value As String)
-        Dim Fraction As Fraction = Parse(Value)
-        _Numerator = Fraction.Numerator
-        _Denominator = Fraction.Denominator
-        Simplify()
+        SetValue(Parse(Value))
     End Sub
     Sub New(Number As Decimal)
         MyClass.New(Number.ToString)
@@ -306,6 +302,9 @@ Public Structure Fraction
     Public Shared Widening Operator CType(Number As Decimal) As Fraction
         Return Fraction.Parse(Number.ToString)
     End Operator
+    Public Shared Narrowing Operator CType(Number As String) As Fraction
+        Return Fraction.Parse(Number)
+    End Operator
 
     Public Shared Narrowing Operator CType(Fraction As Fraction) As Byte
         Return CByte(Fraction.WholeNumber)
@@ -335,9 +334,16 @@ Public Structure Fraction
         Return Single.Parse(Fraction.ToString(10))
     End Operator
     Public Shared Narrowing Operator CType(Fraction As Fraction) As Double
-        Return Single.Parse(Fraction.ToString(20))
+        Return Double.Parse(Fraction.ToString(20))
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As Fraction) As Decimal
+        Return Decimal.Parse(Fraction.ToString(30))
+    End Operator
+    Public Shared Widening Operator CType(Fraction As Fraction) As String
+        Return Fraction.ToString
     End Operator
 
+    Public Shared Property AutoSimplify As Boolean = True
     Public Shared ReadOnly Property Unit As Fraction
         Get
             Return New Fraction(1, 1)
@@ -353,31 +359,60 @@ Public Structure Fraction
             Return New Fraction(0, 0)
         End Get
     End Property
-    Public Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
-        First = BigInteger.Abs(First)
-        Second = BigInteger.Abs(Second)
-        Dim Reminder As BigInteger
-        While Second > 0
-            Reminder = First Mod Second
-            First = Second
-            Second = Reminder
-        End While
-        Return First
+    Public Shared Function Sin(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Dim Result As Fraction = Null
+        For I As ULong = 1 To Terms
+            Result += (-1) ^ (I - 1) * Radian ^ (2 * I - 1) / Factorial(2 * I - 1)
+        Next
+        Return Result
+    End Function
+    Public Shared Function Cos(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Dim Result As Fraction = Null
+        For I As ULong = 1 To Terms
+            Result += (-1) ^ (I - 1) * Radian ^ (2 * I - 2) / Factorial(2 * I - 2)
+        Next
+        Return Result
+    End Function
+    Public Shared Function Tan(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Return Sin(Radian, Terms) / Cos(Radian, Terms)
+    End Function
+    Public Shared Function Csc(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Return 1 / Sin(Radian, Terms)
+    End Function
+    Public Shared Function Sec(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Return 1 / Cos(Radian, Terms)
+    End Function
+    Public Shared Function Cot(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
+        Return 1 / Tan(Radian, Terms)
+    End Function
+    Public Shared Function Binomial(First As Fraction, Second As Fraction, Power As BigInteger)
+        Dim Result As Fraction = Null
+        Dim AbsolutePower As BigInteger = BigInteger.Abs(Power)
+        For I = 0 To AbsolutePower
+            Result += nCr(AbsolutePower, I) * First ^ (AbsolutePower - I) * Second ^ I
+        Next
+        If Power < 0 Then
+            Return Result.Inverse
+        Else
+            Return Result
+        End If
     End Function
     Public Shared Function TryParse(Value As String, ByRef Result As Fraction) As Boolean
         If Value Is Nothing OrElse Value = "" Then Return False
         Value = Value.Trim(" "c)
         Dim IsConverted As Boolean
-        If Value.Contains("/") Then
+        If LCase(Value) = "undefined" Then
+            Result = Fraction.Undefined
+        ElseIf Value.Contains("/") Then
             Dim tmp() = Value.Split("/"c)
             If tmp.Length <> 2 Then Return False
-            Dim Numerator As BigInteger = 0
-            Dim Denominator As BigInteger = 0
-            IsConverted = BigInteger.TryParse(tmp(0), Numerator)
+            Dim Numerator As Fraction = 0
+            Dim Denominator As Fraction = 0
+            IsConverted = TryParse(tmp(0), Numerator)
             If IsConverted = False Then Return False
-            IsConverted = BigInteger.TryParse(tmp(1), Denominator)
+            IsConverted = TryParse(tmp(1), Denominator)
             If IsConverted = False Then Return False
-            Result = New Fraction(Numerator, Denominator)
+            Result = Numerator / Denominator
         ElseIf Value.Contains(".") Then
             Dim IsNegitive As Boolean = False
             If Value(0) = "-" Then IsNegitive = True
@@ -421,5 +456,27 @@ Public Structure Fraction
         Else
             Return Fraction
         End If
+    End Function
+
+    Public Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
+        First = BigInteger.Abs(First)
+        Second = BigInteger.Abs(Second)
+        Dim Reminder As BigInteger
+        While Second > 0
+            Reminder = First Mod Second
+            First = Second
+            Second = Reminder
+        End While
+        Return First
+    End Function
+    Public Shared Function nCr(n As BigInteger, r As BigInteger) As BigInteger
+        Return BigInteger.Divide(Factorial(n), BigInteger.Multiply(Factorial(r), Factorial(n - r)))
+    End Function
+    Public Shared Function Factorial(Number As BigInteger) As BigInteger
+        Dim Result As BigInteger = 1
+        For I As BigInteger = 1 To Number
+            Result = Result * I
+        Next
+        Return Result
     End Function
 End Structure
