@@ -54,6 +54,15 @@ Public Structure MixedFraction
             Return IsInfinity And _Numerator < 0
         End Get
     End Property
+    Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
+        SetValue(0, Numerator, Denominator)
+    End Sub
+    Public Sub SetValue([Integer] As BigInteger, Numerator As BigInteger, Denominator As BigInteger)
+        _Integer = [Integer]
+        _Numerator = Numerator
+        _Denominator = Denominator
+        Resolve()
+    End Sub
     Private Sub Resolve()
         If _Denominator = 0 Then
             _Integer = 0
@@ -63,12 +72,22 @@ Public Structure MixedFraction
                 _Numerator = -1
             End If
         Else
+            Dim GCD As BigInteger = MixedFraction.GCD(_Numerator, _Denominator)
+            _Numerator = _Numerator / GCD
+            _Denominator = _Denominator / GCD
             If _Numerator < 0 Or _Denominator < 0 And Not (_Numerator < 0 And _Denominator < 0) Then
-
+                Dim Remainder As BigInteger = 0
+                Dim WholePart As BigInteger = BigInteger.DivRem(BigInteger.Abs(_Numerator), BigInteger.Abs(_Denominator), Remainder)
+                _Integer -= WholePart + 1
+                _Numerator = _Denominator - Remainder
+            Else
+                Dim Remainder As BigInteger = 0
+                Dim WholePart As BigInteger = BigInteger.DivRem(BigInteger.Abs(_Numerator), BigInteger.Abs(_Denominator), Remainder)
+                _Integer += WholePart
+                _Numerator = Remainder
             End If
         End If
     End Sub
-
     Private Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
         First = BigInteger.Abs(First)
         Second = BigInteger.Abs(Second)
