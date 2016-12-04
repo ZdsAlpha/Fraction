@@ -1,5 +1,5 @@
 ﻿Imports System.Numerics
-
+'Underconstruction
 Public Structure MixedFraction
     Private _Integer As BigInteger
     Private _Numerator As BigInteger
@@ -63,7 +63,9 @@ Public Structure MixedFraction
                 _Numerator = -1
             End If
         Else
+            If _Numerator < 0 Or _Denominator < 0 And Not (_Numerator < 0 And _Denominator < 0) Then
 
+            End If
         End If
     End Sub
 
