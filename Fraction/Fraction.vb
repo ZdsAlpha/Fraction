@@ -385,7 +385,7 @@ Public Structure Fraction
     Public Shared Function Cot(Radian As Fraction, Optional Terms As ULong = 5) As Fraction
         Return 1 / Tan(Radian, Terms)
     End Function
-    Public Shared Function Binomial(First As Fraction, Second As Fraction, Power As BigInteger)
+    Public Shared Function Binomial(First As Fraction, Second As Fraction, Power As BigInteger) As Fraction
         Dim Result As Fraction = Null
         Dim AbsolutePower As BigInteger = BigInteger.Abs(Power)
         For I = 0 To AbsolutePower

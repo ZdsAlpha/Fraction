@@ -54,6 +54,7 @@ Public Structure MixedFraction
             Return IsInfinity And _Numerator < 0
         End Get
     End Property
+
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
         SetValue(0, Numerator, Denominator)
     End Sub
@@ -63,6 +64,13 @@ Public Structure MixedFraction
         _Denominator = Denominator
         Resolve()
     End Sub
+    Public Overrides Function ToString() As String
+        If IsPositiveInfinity Then Return "+Infinity"
+        If IsNegativeInfinity Then Return "-Infinity"
+        If IsUndefined Then Return "Undefined"
+        Return Numerator.ToString + "/"c + Denominator.ToString
+    End Function
+
     Private Sub Resolve()
         If _Denominator = 0 Then
             _Integer = 0
@@ -88,6 +96,97 @@ Public Structure MixedFraction
             End If
         End If
     End Sub
+
+    Sub New(Numerator As BigInteger, Denominator As BigInteger)
+        SetValue(Numerator, Denominator)
+    End Sub
+    Sub New([Integer] As BigInteger, Numerator As BigInteger, Denominator As BigInteger)
+        SetValue([Integer], Numerator, Denominator)
+    End Sub
+
+    Public Shared ReadOnly Property Null As MixedFraction
+        Get
+            Return New MixedFraction(0, 1)
+        End Get
+    End Property
+    Public Shared ReadOnly Property Unit As MixedFraction
+        Get
+            Return New MixedFraction(1, 1)
+        End Get
+    End Property
+    Public Shared ReadOnly Property Undefined As MixedFraction
+        Get
+            Return New MixedFraction(0, 0)
+        End Get
+    End Property
+    Public Shared ReadOnly Property PositiveInfinity As MixedFraction
+        Get
+            Return New MixedFraction(1, 0)
+        End Get
+    End Property
+    Public Shared ReadOnly Property NegativeInfinity As MixedFraction
+        Get
+            Return New MixedFraction(-1, 0)
+        End Get
+    End Property
+
+    Public Shared Widening Operator CType(Number As Byte) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As SByte) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As Short) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As UShort) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As Integer) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As UInteger) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As Long) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As ULong) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+    Public Shared Widening Operator CType(Number As BigInteger) As MixedFraction
+        Return New MixedFraction(Number, 1)
+    End Operator
+
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As Byte
+        Return CByte(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As SByte
+        Return CSByte(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As Short
+        Return CShort(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As UShort
+        Return CUShort(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As Integer
+        Return CInt(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As UInteger
+        Return CUInt(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As Long
+        Return CLng(Fraction.Integer)
+    End Operator
+    Public Shared Narrowing Operator CType(Fraction As MixedFraction) As ULong
+        Return CULng(Fraction.Integer)
+    End Operator
+
+    Public Shared Function Add(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As MixedFraction
+        Return New MixedFraction(Fraction1.Integer + Fraction2.Integer, Fraction2.ProperNumerator * Fraction1.Denominator + Fraction1.ProperNumerator * Fraction2.Denominator, Fraction1.Denominator * Fraction2.Denominator)
+    End Function
+
     Private Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
         First = BigInteger.Abs(First)
         Second = BigInteger.Abs(Second)
