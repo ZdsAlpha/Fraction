@@ -19,4 +19,4 @@ Best solution if you are dealing with fraction. It is implemented over BigIntege
 
 ## Upcoming Features ##
 
- 1. Generic fraction. (Implement fraction over custom numeric type e.g Int64 to increase performance.)
+ 1. Change in internal structure of fraction. (Fraction to be stored in form of mixed fraction to increase performance)
