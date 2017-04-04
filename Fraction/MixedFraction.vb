@@ -24,6 +24,40 @@ Public Structure MixedFraction
             Return _Integer * _Denominator + _Numerator
         End Get
     End Property
+    Public ReadOnly Property Direction As BigInteger
+        Get
+            If IsPositiveInfinity Then Return 1
+            If IsNegativeInfinity Then Return -1
+            If IsUndefined Then Return 0
+            If IsNull Then
+                Return 0
+            ElseIf [Integer] < 0 Then
+                Return -1
+            Else
+                Return 1
+            End If
+        End Get
+    End Property
+    Public ReadOnly Property Negative As MixedFraction
+        Get
+            Return New MixedFraction(-[Integer], -ProperNumerator, Denominator)
+        End Get
+    End Property
+    Public ReadOnly Property Inverse As MixedFraction
+        Get
+            Return New MixedFraction(Denominator, Numerator)
+        End Get
+    End Property
+    Public ReadOnly Property IsPositive As Boolean
+        Get
+            Return Direction = 1
+        End Get
+    End Property
+    Public ReadOnly Property IsNegative As Boolean
+        Get
+            Return Direction = -1
+        End Get
+    End Property
     Public ReadOnly Property IsUndefined As Boolean
         Get
             Return _Denominator = 0
@@ -34,7 +68,7 @@ Public Structure MixedFraction
             Return _Integer = 0 And _Numerator = 0 And _Denominator = 1
         End Get
     End Property
-    Public ReadOnly Property IsUnit As Boolean
+    Public ReadOnly Property IsUnity As Boolean
         Get
             Return _Integer = 1 And _Numerator = 0 And _Denominator = 1
         End Get
@@ -72,6 +106,10 @@ Public Structure MixedFraction
     End Function
 
     Private Sub Resolve()
+        If _Denominator < 0 Then
+            _Numerator = -_Numerator
+            _Denominator = BigInteger.Abs(_Denominator)
+        End If
         If _Denominator = 0 Then
             _Integer = 0
             If _Numerator > 0 Then
@@ -83,7 +121,7 @@ Public Structure MixedFraction
             Dim GCD As BigInteger = MixedFraction.GCD(_Numerator, _Denominator)
             _Numerator = _Numerator / GCD
             _Denominator = _Denominator / GCD
-            If _Numerator < 0 Or _Denominator < 0 And Not (_Numerator < 0 And _Denominator < 0) Then
+            If _Numerator < 0 Then
                 Dim Remainder As BigInteger = 0
                 Dim WholePart As BigInteger = BigInteger.DivRem(BigInteger.Abs(_Numerator), BigInteger.Abs(_Denominator), Remainder)
                 _Integer -= WholePart + 1
@@ -109,7 +147,7 @@ Public Structure MixedFraction
             Return New MixedFraction(0, 1)
         End Get
     End Property
-    Public Shared ReadOnly Property Unit As MixedFraction
+    Public Shared ReadOnly Property Unity As MixedFraction
         Get
             Return New MixedFraction(1, 1)
         End Get
@@ -183,8 +221,43 @@ Public Structure MixedFraction
         Return CULng(Fraction.Integer)
     End Operator
 
+    Public Shared Function Negate(Fraction As MixedFraction) As MixedFraction
+        If Fraction.IsPositiveInfinity Then Return NegativeInfinity
+        If Fraction.IsNegativeInfinity Then Return PositiveInfinity
+        If Fraction.IsUndefined Then Return Undefined
+        Return New MixedFraction(-Fraction.Integer, -Fraction.ProperNumerator, Fraction.Denominator)
+    End Function
     Public Shared Function Add(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As MixedFraction
-        Return New MixedFraction(Fraction1.Integer + Fraction2.Integer, Fraction2.ProperNumerator * Fraction1.Denominator + Fraction1.ProperNumerator * Fraction2.Denominator, Fraction1.Denominator * Fraction2.Denominator)
+        If Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity Then Return PositiveInfinity
+        If Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity Then Return NegativeInfinity
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return Undefined
+        Return New MixedFraction(Fraction1.Integer + Fraction2.Integer, Fraction1.ProperNumerator * Fraction2.Denominator + Fraction2.ProperNumerator * Fraction1.Denominator, Fraction1.Denominator * Fraction2.Denominator)
+    End Function
+    Public Shared Function Subtract(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As MixedFraction
+        If Fraction1.IsPositiveInfinity And Fraction2.IsNegativeInfinity Then Return PositiveInfinity
+        If Fraction1.IsNegativeInfinity And Fraction2.IsPositiveInfinity Then Return NegativeInfinity
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return Undefined
+        Return New MixedFraction(Fraction1.Integer - Fraction2.Integer, Fraction1.ProperNumerator * Fraction2.Denominator - Fraction2.ProperNumerator * Fraction1.Denominator, Fraction1.Denominator * Fraction2.Denominator)
+    End Function
+    Public Shared Function Multiply(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As MixedFraction
+        If (Fraction1.IsInfinity Or Fraction2.IsInfinity) And ((Fraction1.IsPositive And Fraction2.IsPositive) Or (Fraction1.IsNegative And Fraction2.IsNegative)) Then Return PositiveInfinity
+        If (Fraction1.IsInfinity Or Fraction2.IsInfinity) And ((Fraction1.IsPositive And Fraction2.IsNegative) Or (Fraction1.IsNegative And Fraction2.IsPositive)) Then Return NegativeInfinity
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return Undefined
+        Return New MixedFraction(Fraction1.Integer * Fraction2.Integer, Fraction1.Integer * Fraction1.Denominator * Fraction2.ProperNumerator + Fraction2.Integer * Fraction2.Denominator * Fraction1.ProperNumerator + Fraction1.ProperNumerator * Fraction2.ProperNumerator, Fraction1.Denominator * Fraction2.Denominator)
+    End Function
+    Public Shared Function Divide(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As MixedFraction
+        If Fraction1.IsInfinity And Not Fraction2.IsInfinity Then
+            If Fraction2.IsPositive Then
+                Return Fraction1
+            ElseIf Fraction2.IsNegative Then
+                Return Negate(Fraction1)
+            Else
+                Return Undefined
+            End If
+        End If
+        If Fraction2.IsInfinity And Not Fraction1.IsInfinity Then Return Null
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return Undefined
+        Return New MixedFraction(Fraction1.Numerator * Fraction2.Denominator, Fraction1.Denominator * Fraction2.Numerator)
     End Function
 
     Private Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
@@ -201,7 +274,7 @@ Public Structure MixedFraction
 End Structure
 'Special Fraction:
 '   Null:               I=0     N=0     D=1
-'   Unit:               I=1     N=0     D=1
+'   Unity:               I=1     N=0     D=1
 '   Undefined:          I=0     N=0     D=0
 '   PositiveInfinity:   I=0     N=1     D=0
 '   NegativeInfinity:   I=0     N=-1    D=0

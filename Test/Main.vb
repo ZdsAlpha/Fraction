@@ -1,7 +1,11 @@
 ﻿Imports Zds
 Module Main
     Sub Main()
-        Dim g = MixedFraction.Add(New MixedFraction(2, 3), New MixedFraction(4, 5))
+        Dim Fraction1 As New MixedFraction(-1, 2, 5)
+        Dim Fraction2 As New MixedFraction(-1, 5, 2)
+        Dim Result As MixedFraction = MixedFraction.Divide(Fraction1, Fraction2)
+        Dim Inverse As MixedFraction = Result.Inverse
+        Result = MixedFraction.Add(Inverse, 1)
         Stop
     End Sub
 End Module
