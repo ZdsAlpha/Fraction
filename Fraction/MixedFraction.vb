@@ -34,7 +34,7 @@ Public Structure MixedFraction
             ElseIf [Integer] < 0 Then
                 Return -1
             Else
-                Return 0
+                If Numerator = 0 Then Return 0 Else Return 1
             End If
         End Get
     End Property
@@ -98,14 +98,6 @@ Public Structure MixedFraction
             Return IsInfinity And _Numerator < 0
         End Get
     End Property
-
-    Public Function Approaches(Fraction1 As MixedFraction, Fraction2 As MixedFraction, Accuracy As Integer) As Boolean
-        If (Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity) Or (Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity) Then Return True
-        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return False
-        Dim Delta As MixedFraction = Abs(Fraction1 - Fraction2)
-        Dim Log10 As Double = BigInteger.Log10(Delta.Numerator) - BigInteger.Log10(Delta.Denominator)
-        Return Log10 < -Accuracy
-    End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
         SetValue(0, Numerator, Denominator)
@@ -182,6 +174,16 @@ Public Structure MixedFraction
             Result = New MixedFraction(Number)
         End If
         Return True
+    End Function
+    Public Shared Function Parse(Value As String) As MixedFraction
+        Dim Fraction As MixedFraction = 0
+        Dim IsConverted As Boolean
+        IsConverted = TryParse(Value, Fraction)
+        If IsConverted = False Then
+            Throw New FormatException("Invalid format. Unable to convert " + Value.ToString + " to fraction.")
+        Else
+            Return Fraction
+        End If
     End Function
 
     Private Sub Resolve()
@@ -299,33 +301,40 @@ Public Structure MixedFraction
             Return Fraction1.ProperNumerator * Fraction2.Denominator < Fraction2.ProperNumerator * Fraction1.Denominator
         End If
     End Operator
+    Public Shared Operator Like(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As Boolean
+        Return MixedFraction.Approaches(Fraction1, Fraction2)
+    End Operator
+
 
     Public Shared Widening Operator CType(Number As Byte) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As SByte) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As Short) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As UShort) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As Integer) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As UInteger) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As Long) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As ULong) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
     End Operator
     Public Shared Widening Operator CType(Number As BigInteger) As MixedFraction
-        Return New MixedFraction(Number, 1)
+        Return New MixedFraction(Number)
+    End Operator
+    Public Shared Widening Operator CType(Number As String) As MixedFraction
+        Return MixedFraction.Parse(Number)
     End Operator
 
     Public Shared Narrowing Operator CType(Fraction As MixedFraction) As Byte
@@ -351,6 +360,9 @@ Public Structure MixedFraction
     End Operator
     Public Shared Narrowing Operator CType(Fraction As MixedFraction) As ULong
         Return CULng(Fraction.Integer)
+    End Operator
+    Public Shared Widening Operator CType(Fraction As MixedFraction) As String
+        Return Fraction.ToString
     End Operator
 
     Public Shared Function Abs(Fraction As MixedFraction) As MixedFraction
@@ -397,6 +409,16 @@ Public Structure MixedFraction
         If Fraction2.IsInfinity And Not Fraction1.IsInfinity Then Return Null
         If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return Undefined
         Return New MixedFraction(Fraction1.Numerator * Fraction2.Denominator, Fraction1.Denominator * Fraction2.Numerator)
+    End Function
+    Public Shared Function Approaches(Fraction1 As MixedFraction, Fraction2 As MixedFraction, Accuracy As Integer) As Boolean
+        If (Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity) Or (Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity) Then Return True
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return False
+        Dim Delta As MixedFraction = Abs(Fraction1 - Fraction2)
+        Dim Log10 As Double = BigInteger.Log10(Delta.Numerator) - BigInteger.Log10(Delta.Denominator)
+        Return Log10 < -Accuracy
+    End Function
+    Public Shared Function Approaches(Fraction1 As MixedFraction, Fraction2 As MixedFraction) As Boolean
+        Return Approaches(Fraction1, Fraction2, 1)
     End Function
 
     Private Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger

@@ -1,11 +1,15 @@
 ﻿Imports Zds
 Module Main
     Sub Main()
-        Dim Fraction1 As New MixedFraction(-1, 2, 5)
-        Dim Fraction2 As New MixedFraction(-1, 5, 2)
-        Dim Result As MixedFraction = MixedFraction.Divide(Fraction1, Fraction2)
-        Dim Inverse As MixedFraction = Result.Inverse
-        Result = MixedFraction.Add(Inverse, 1)
-        Stop
+        Console.Write("Enter a number:")
+        Dim N1 As MixedFraction = Console.ReadLine
+        Console.Write("Enter second number:")
+        Dim N2 As MixedFraction = Console.ReadLine
+        If N1 Like N2 Then
+            Console.WriteLine("Numbers are similar")
+        Else
+            Console.WriteLine("Numbers are different")
+        End If
+        Console.ReadKey()
     End Sub
 End Module
