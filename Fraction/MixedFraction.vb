@@ -99,6 +99,14 @@ Public Structure MixedFraction
         End Get
     End Property
 
+    Public Function Approaches(Fraction1 As MixedFraction, Fraction2 As MixedFraction, Accuracy As Integer) As Boolean
+        If (Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity) Or (Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity) Then Return True
+        If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return False
+        Dim Delta As MixedFraction = Abs(Fraction1 - Fraction2)
+        Dim Log10 As Double = BigInteger.Log10(Delta.Numerator) - BigInteger.Log10(Delta.Denominator)
+        Return Log10 < -Accuracy
+    End Function
+
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
         SetValue(0, Numerator, Denominator)
     End Sub
@@ -108,11 +116,72 @@ Public Structure MixedFraction
         _Denominator = Denominator
         Resolve()
     End Sub
-    Public Overrides Function ToString() As String
+    Public Shadows Function ToString() As String
         If IsPositiveInfinity Then Return "+Infinity"
         If IsNegativeInfinity Then Return "-Infinity"
         If IsUndefined Then Return "Undefined"
         Return Numerator.ToString + "/"c + Denominator.ToString
+    End Function
+    Public Shadows Function ToString(DigitsAfterPoint As ULong) As String
+        If IsPositiveInfinity Then Return "+Infinity"
+        If IsNegativeInfinity Then Return "-Infinity"
+        If IsUndefined Then Return "Undefined"
+        Dim sb As New Text.StringBuilder
+        Dim Whole As BigInteger = BigInteger.Abs([Integer])
+        sb.Append([Integer].ToString)
+        sb.Append("."c)
+        Dim Numerator As BigInteger = _Numerator
+        Dim Denominator As BigInteger = _Denominator
+        For i = 0 To DigitsAfterPoint - 1
+            Numerator = Numerator * 10
+            sb.Append(BigInteger.DivRem(Numerator, Denominator, Numerator).ToString)
+        Next
+        Return sb.ToString
+    End Function
+    Public Shared Function TryParse(Value As String, ByRef Result As MixedFraction) As Boolean
+        If Value Is Nothing OrElse Value = "" Then Return False
+        Value = Value.Trim(" "c)
+        Value = LCase(Value)
+        Dim IsConverted As Boolean
+        If Value = "undefined" Then
+            Result = Undefined
+        ElseIf Value = "infinity" Or Value = "+infinity" Then
+            Result = PositiveInfinity
+        ElseIf Value = "-infinity" Then
+            Result = NegativeInfinity
+        ElseIf Value.Contains("/") Then
+            Dim tmp() = Value.Split("/"c)
+            If tmp.Length <> 2 Then Return False
+            Dim Numerator As MixedFraction = 0
+            Dim Denominator As MixedFraction = 0
+            IsConverted = TryParse(tmp(0), Numerator)
+            If IsConverted = False Then Return False
+            IsConverted = TryParse(tmp(1), Denominator)
+            If IsConverted = False Then Return False
+            Result = Numerator / Denominator
+        ElseIf Value.Contains(".") Then
+            Dim tmp() = Value.Split("."c)
+            If tmp(1).Contains("-") Then Return False
+            Dim [Integer] As BigInteger = 0
+            If tmp(0) <> "" Then
+                IsConverted = BigInteger.TryParse(tmp(0), [Integer])
+                If IsConverted = False Then Return False
+            End If
+            Dim ProperNumerator As BigInteger = 0
+            If tmp(1) <> "" Then
+                IsConverted = BigInteger.TryParse(tmp(1), ProperNumerator)
+                If IsConverted = False Then Return False
+            End If
+            Dim ProperDenominator As BigInteger = 10
+            ProperDenominator = BigInteger.Pow(ProperDenominator, tmp(1).Length)
+            Result = New MixedFraction([Integer], ProperNumerator, ProperDenominator)
+        Else
+            Dim Number As BigInteger = 0
+            IsConverted = BigInteger.TryParse(Value, Number)
+            If IsConverted = False Then Return False
+            Result = New MixedFraction(Number)
+        End If
+        Return True
     End Function
 
     Private Sub Resolve()
@@ -145,6 +214,9 @@ Public Structure MixedFraction
         End If
     End Sub
 
+    Sub New(Value As BigInteger)
+        SetValue(Value, 0, 1)
+    End Sub
     Sub New(Numerator As BigInteger, Denominator As BigInteger)
         SetValue(Numerator, Denominator)
     End Sub
@@ -281,6 +353,13 @@ Public Structure MixedFraction
         Return CULng(Fraction.Integer)
     End Operator
 
+    Public Shared Function Abs(Fraction As MixedFraction) As MixedFraction
+        If Fraction.IsPositive Then
+            Return Fraction
+        Else
+            Return Negate(Fraction)
+        End If
+    End Function
     Public Shared Function Negate(Fraction As MixedFraction) As MixedFraction
         If Fraction.IsPositiveInfinity Then Return NegativeInfinity
         If Fraction.IsNegativeInfinity Then Return PositiveInfinity
