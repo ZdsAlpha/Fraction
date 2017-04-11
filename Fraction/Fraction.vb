@@ -452,6 +452,23 @@ Public Structure Fraction
         Return New Fraction(Fraction1.Numerator * Fraction2.Denominator, Fraction1.Denominator * Fraction2.Numerator)
     End Function
     Public Shared Function Pow(Fraction As Fraction, Power As Integer) As Fraction
+        If Fraction.IsNull Then
+            If Power = 0 Then
+                Return Undefined
+            Else
+                Return Null
+            End If
+        ElseIf Fraction.IsInfinity Then
+            If Power > 0 Then
+                Return Fraction
+            ElseIf Power < 0 Then
+                Return Null
+            Else
+                Return Undefined
+            End If
+        ElseIf Fraction.IsUndefined Then
+            Return Undefined
+        End If
         If Power = 0 Then Return 1
         If Power < 0 Then
             Fraction = Fraction.Inverse
