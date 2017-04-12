@@ -99,17 +99,11 @@ Public Structure Fraction
         End Get
     End Property
 
-    Public Function Approches(Fraction As Fraction, Depth As Integer) As Boolean
+    Public Function Approches(Fraction As Fraction, Optional Depth As Integer = 1) As Boolean
         Return Approaches(Me, Fraction, Depth)
     End Function
-    Public Function Approches(Fraction As Fraction) As Boolean
-        Return Approaches(Me, Fraction)
-    End Function
-    Public Function ApprochesE(Fraction As Fraction, Depth As Integer) As Boolean
+    Public Function ApprochesE(Fraction As Fraction, Optional Depth As Integer = 2) As Boolean
         Return ApproachesE(Me, Fraction, Depth)
-    End Function
-    Public Function ApprochesE(Fraction As Fraction) As Boolean
-        Return ApproachesE(Me, Fraction)
     End Function
 
     Public Sub SetValue(Numerator As BigInteger, Denominator As BigInteger)
@@ -468,9 +462,18 @@ Public Structure Fraction
             End If
         ElseIf Fraction.IsUndefined Then
             Return Undefined
+        ElseIf Fraction.IsUnity Then
+            Return Unity
+        ElseIf Fraction.Negative.IsUnity Then
+            If Power Mod 2 = 0 Then
+                Return Unity
+            Else
+                Return Unity.Negative
+            End If
         End If
-        If Power = 0 Then Return 1
-        If Power < 0 Then
+        If Power = 0 Then
+            Return 1
+        ElseIf Power < 0 Then
             Fraction = Fraction.Inverse
             Power = Math.Abs(Power)
         End If
@@ -482,25 +485,19 @@ Public Structure Fraction
         Return Result
     End Function
 
-    Public Shared Function Approaches(Fraction1 As Fraction, Fraction2 As Fraction, Depth As Integer) As Boolean
+    Public Shared Function Approaches(Fraction1 As Fraction, Fraction2 As Fraction, Optional Depth As Integer = 1) As Boolean
         If (Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity) Or (Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity) Then Return True
         If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return False
         Dim Delta As Fraction = Abs(Fraction1 - Fraction2)
         Dim Log10 As Double = BigInteger.Log10(Delta.Numerator) - BigInteger.Log10(Delta.Denominator)
         Return Log10 < -Depth
     End Function
-    Public Shared Function Approaches(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        Return Approaches(Fraction1, Fraction2, 1)
-    End Function
-    Public Shared Function ApproachesE(Fraction1 As Fraction, Fraction2 As Fraction, Depth As Integer) As Boolean
+    Public Shared Function ApproachesE(Fraction1 As Fraction, Fraction2 As Fraction, Optional Depth As Integer = 2) As Boolean
         If (Fraction1.IsPositiveInfinity And Fraction2.IsPositiveInfinity) Or (Fraction1.IsNegativeInfinity And Fraction2.IsNegativeInfinity) Then Return True
         If Fraction1.IsUndefined Or Fraction2.IsUndefined Then Return False
         Dim Delta As Fraction = Abs(Fraction1 - Fraction2)
         Dim Log As Double = BigInteger.Log(Delta.Numerator) - BigInteger.Log(Delta.Denominator)
         Return Log < -Depth
-    End Function
-    Public Shared Function ApproachesE(Fraction1 As Fraction, Fraction2 As Fraction) As Boolean
-        Return ApproachesE(Fraction1, Fraction2, 2)
     End Function
 
     Private Shared Function GCD(First As BigInteger, Second As BigInteger) As BigInteger
