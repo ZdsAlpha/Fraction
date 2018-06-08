@@ -38,6 +38,11 @@ Public Structure Fraction
             End If
         End Get
     End Property
+    Public ReadOnly Property Absolute As Fraction
+        Get
+            Return Abs(Me)
+        End Get
+    End Property
     Public ReadOnly Property Negative As Fraction
         Get
             Return New Fraction(-[Integer], -ProperNumerator, Denominator)
@@ -98,6 +103,22 @@ Public Structure Fraction
             Return IsInfinity And _Numerator < 0
         End Get
     End Property
+
+    Public Function Add(Fraction As Fraction) As Fraction
+        Return Add(Me, Fraction)
+    End Function
+    Public Function Subtract(Fraction As Fraction) As Fraction
+        Return Subtract(Me, Fraction)
+    End Function
+    Public Function Multiply(Fraction As Fraction) As Fraction
+        Return Multiply(Me, Fraction)
+    End Function
+    Public Function Divide(Fraction As Fraction) As Fraction
+        Return Divide(Me, Fraction)
+    End Function
+    Public Function Pow(Power As Integer) As Fraction
+        Return Pow(Me, Power)
+    End Function
 
     Public Function Approches(Fraction As Fraction, Optional Depth As Integer = 1) As Boolean
         Return Approaches(Me, Fraction, Depth)
@@ -368,7 +389,7 @@ Public Structure Fraction
     Public Shared Widening Operator CType(Number As BigInteger) As Fraction
         Return New Fraction(Number)
     End Operator
-    Public Shared Narrowing Operator CType(Number As String) As Fraction
+    Public Shared Widening Operator CType(Number As String) As Fraction
         Return Parse(Number)
     End Operator
 
